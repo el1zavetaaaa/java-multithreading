@@ -1,4 +1,4 @@
-package basics;
+package basics.runnable;
 
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -7,8 +7,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Spy;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static basics.utility.MultiThreadingBase.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RunnableInterfaceRealizationTest {
@@ -19,15 +23,11 @@ public class RunnableInterfaceRealizationTest {
     @Spy
     static LiftOff launchAfter10 = new LiftOff(10);
     @Spy
-    static FibonacciConcurrent fibonacciConcurrent18 = new FibonacciConcurrent(18);
+    static FibonacciRunnable fibonacciConcurrent18 = new FibonacciRunnable(18);
     @Spy
-    static FibonacciConcurrent fibonacciConcurrent5 = new FibonacciConcurrent(5);
+    static FibonacciRunnable fibonacciConcurrent5 = new FibonacciRunnable(5);
     @Spy
-    static FibonacciConcurrent fibonacciConcurrent10 = new FibonacciConcurrent(10);
-
-    final static List<Integer> arrayList18 = List.of(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584);
-    final static List<Integer> arrayList5 = List.of(1, 1, 2, 3, 5);
-    final static List<Integer> arrayList10 = List.of(1, 1, 2, 3, 5, 8, 13, 21, 34, 55);
+    static FibonacciRunnable fibonacciConcurrent10 = new FibonacciRunnable(10);
 
     private static Stream<Arguments> launchAfterSecondsConfigurationForSingleThread() {
         return Stream.of(Arguments.of(5, launchAfter5),
@@ -52,7 +52,6 @@ public class RunnableInterfaceRealizationTest {
                 arrayList10, fibonacciConcurrent10,
                 arrayList18, fibonacciConcurrent18));
     }
-
 
     @ParameterizedTest
     @MethodSource("launchAfterSecondsConfigurationForSingleThread")
@@ -94,7 +93,7 @@ public class RunnableInterfaceRealizationTest {
 
     @ParameterizedTest
     @MethodSource("testFibonacciConfigurationForSingleThread")
-    public void testFibonacci1Thread(final List<Integer> arrayList, final FibonacciConcurrent fibonacciConcurrent) throws InterruptedException {
+    public void testFibonacci1Thread(final List<Integer> arrayList, final FibonacciRunnable fibonacciConcurrent) throws InterruptedException {
         Thread thread = new Thread(fibonacciConcurrent);
 
         thread.start();
@@ -108,11 +107,11 @@ public class RunnableInterfaceRealizationTest {
     @ParameterizedTest
     @MethodSource("testFibonacciConfigurationForMultipleThreads")
     public void testFibonacciMultipleThreads(final List<Integer> list1,
-                                             final FibonacciConcurrent fibonacci1,
+                                             final FibonacciRunnable fibonacci1,
                                              final List<Integer> list2,
-                                             final FibonacciConcurrent fibonacci2,
+                                             final FibonacciRunnable fibonacci2,
                                              final List<Integer> list3,
-                                             final FibonacciConcurrent fibonacci3) throws InterruptedException {
+                                             final FibonacciRunnable fibonacci3) throws InterruptedException {
         Thread thread1 = new Thread(fibonacci1);
         Thread thread2 = new Thread(fibonacci2);
         Thread thread3 = new Thread(fibonacci3);
@@ -132,6 +131,19 @@ public class RunnableInterfaceRealizationTest {
         fibonacci1.clean();
         fibonacci2.clean();
         fibonacci3.clean();
+    }
+
+    @ParameterizedTest
+    @MethodSource("launchAfterSecondsConfigurationForSingleThread")
+    public void testWithSingleThreadExecutor(final int interactionsCount, final LiftOff launch) throws InterruptedException {
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+
+        for (int i = 0; i < 5; i++) {
+            exec.execute(launch);
+            exec.awaitTermination(10L, TimeUnit.MILLISECONDS);
+            assertEquals(interactionsCount, launch.getInteractionCount());
+        }
+        exec.shutdown();
     }
 
 }

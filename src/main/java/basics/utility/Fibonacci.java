@@ -1,4 +1,4 @@
-package basics;
+package basics.utility;
 
 public class Fibonacci {
     private int count = 0;

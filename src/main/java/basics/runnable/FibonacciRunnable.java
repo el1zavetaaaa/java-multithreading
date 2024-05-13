@@ -1,12 +1,14 @@
-package basics;
+package basics.runnable;
+
+import basics.utility.Fibonacci;
 
 import java.util.ArrayList;
 
-public class FibonacciConcurrent implements Runnable{
+public class FibonacciRunnable implements Runnable{
     private int quantity;
     private ArrayList<Integer> fibonacciSequence = new ArrayList<>();
 
-    public FibonacciConcurrent(int quantity) {
+    public FibonacciRunnable(int quantity) {
         this.quantity = quantity;
     }
 
