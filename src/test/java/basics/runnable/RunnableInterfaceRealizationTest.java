@@ -29,7 +29,7 @@ public class RunnableInterfaceRealizationTest {
     @Spy
     static FibonacciRunnable fibonacciConcurrent10 = new FibonacciRunnable(10);
 
-    private static Stream<Arguments> launchAfterSecondsConfigurationForSingleThread() {
+    private static Stream<Arguments> launchAfterSecondsConfiguration() {
         return Stream.of(Arguments.of(5, launchAfter5),
                 Arguments.of(3, launchAfter3),
                 Arguments.of(10, launchAfter10));
@@ -54,7 +54,7 @@ public class RunnableInterfaceRealizationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("launchAfterSecondsConfigurationForSingleThread")
+    @MethodSource("launchAfterSecondsConfiguration")
     public void testRunnableInterfaceRealizationWith1Thread(final int interactionsCount, final LiftOff launch) throws InterruptedException {
         Thread test = new Thread(launch);
         test.start();
@@ -134,7 +134,7 @@ public class RunnableInterfaceRealizationTest {
     }
 
     @ParameterizedTest
-    @MethodSource("launchAfterSecondsConfigurationForSingleThread")
+    @MethodSource("launchAfterSecondsConfiguration")
     public void testWithSingleThreadExecutor(final int interactionsCount, final LiftOff launch) throws InterruptedException {
         ExecutorService exec = Executors.newSingleThreadExecutor();
 
@@ -146,4 +146,16 @@ public class RunnableInterfaceRealizationTest {
         exec.shutdown();
     }
 
+    @ParameterizedTest
+    @MethodSource("launchAfterSecondsConfiguration")
+    public void testWithMultipleThreadsExecutor(final int interactionsCount, final LiftOff launch) throws InterruptedException {
+        ExecutorService exec = Executors.newFixedThreadPool(6);
+
+        for (int i = 0; i < 5; i++) {
+            exec.execute(launch);
+            exec.awaitTermination(10L, TimeUnit.MILLISECONDS);
+            assertEquals(interactionsCount, launch.getInteractionCount());
+        }
+        exec.shutdown();
+    }
 }
