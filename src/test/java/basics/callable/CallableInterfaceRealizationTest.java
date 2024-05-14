@@ -32,12 +32,29 @@ public class CallableInterfaceRealizationTest {
                 Arguments.of(arrayList10, fibonacciCallable10));
     }
 
+    private static Stream<Arguments> testConfigurationForExecutionOfCallableInterfaceInsideAMethod() {
+        return Stream.of(Arguments.of(18, arrayList18),
+                Arguments.of(5, arrayList5),
+                Arguments.of(10, arrayList10));
+    }
+
     @ParameterizedTest
     @MethodSource("testFibonacciConfigurationForCallableRealization")
     public void fibonacciCallableShouldReturnSequence(final List<Integer> result, final FibonacciCallable fibonacciCallable) {
         ExecutorService exec = Executors.newCachedThreadPool();
         Future<ArrayList<Integer>> executionResult = exec.submit(fibonacciCallable);
 
+        try {
+            assertEquals(result, executionResult.get());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("testConfigurationForExecutionOfCallableInterfaceInsideAMethod")
+    public void testCallableCreationInsideMethod(final int quantity, final List<Integer> result) {
+        Future<ArrayList<Integer>> executionResult = new CallableMethod().callTask(quantity);
         try {
             assertEquals(result, executionResult.get());
         } catch (InterruptedException | ExecutionException e) {
