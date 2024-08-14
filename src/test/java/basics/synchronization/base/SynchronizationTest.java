@@ -1,5 +1,9 @@
-package basics.synchronization;
+package basics.synchronization.base;
 
+import basics.synchronization.base.CharacterAppender;
+import basics.synchronization.base.CharacterAppenderSynchronized;
+import basics.synchronization.base.CharacterChecker;
+import basics.synchronization.base.CharacterCheckerSynchronized;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

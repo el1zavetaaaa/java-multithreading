@@ -1,4 +1,4 @@
-package basics.synchronization;
+package basics.synchronization.base;
 
 public class CharacterAppenderSynchronized {
     private StringBuilder stringBuilder;

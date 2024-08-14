@@ -1,4 +1,4 @@
-package basics.synchronization;
+package basics.synchronization.base;
 
 public class CharacterCheckerSynchronized implements Runnable {
     private CharacterAppenderSynchronized appender;
